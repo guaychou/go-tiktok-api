@@ -38,6 +38,7 @@ func NewTiktok() *Tiktok {
 		r.Headers.Set("Accept-Encoding","gzip, deflate")
 		r.Headers.Set("Accept-Language","en-US,en;q=0.9")
 	})
+	c.AllowURLRevisit = true
 	t:=&Tiktok{
 		scraper: c,
 	}
