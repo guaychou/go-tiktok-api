@@ -21,8 +21,8 @@ func (t *Tiktok) GetVideo(copiedLink string) (*TiktokResultData, error) {
 		})
 		err=t.scraper.Visit(copiedLink)
 		data :=TiktokResultData{
-			ImageUrl: dataInterface.Props.PageProps.VideoData.ItemInfos.Image[0],
-			VideoUrl: dataInterface.Props.PageProps.VideoData.ItemInfos.Video.Url[0],
+			ImageURL: dataInterface.Props.PageProps.VideoData.ItemInfos.Image[0],
+			VideoURL: dataInterface.Props.PageProps.VideoData.ItemInfos.Video.Url[0],
 			Text: dataInterface.Props.PageProps.VideoData.ItemInfos.Text,
 		}
 		return &data,err
