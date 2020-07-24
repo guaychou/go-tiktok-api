@@ -1,6 +1,6 @@
-##Go Tiktok API
+## Go Tiktok API
 
-###Example of Usage
+### Example of Usage
 ```cassandraql
 package main
 
