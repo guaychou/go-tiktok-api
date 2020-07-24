@@ -2,22 +2,32 @@ package tiktok
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/gocolly/colly"
+	"net/url"
+	"strings"
 )
 
 type Tiktok struct {
 	scraper *colly.Collector
 }
 
-func (t *Tiktok) GetVideo(copiedLink string)(Data,error){
-	dataInterface:=Props{}
-	var err error
-	t.scraper.OnHTML("script[id=__NEXT_DATA__]", func(e *colly.HTMLElement) {
-		err=json.Unmarshal([]byte(e.Text),&dataInterface)
-	})
-	err=t.scraper.Visit(copiedLink)
-	data:=dataInterface.Props.PageProps.VideoData.ItemInfos
-	return data,err
+func (t *Tiktok) GetVideo(copiedLink string) (*TiktokResultData, error) {
+	if isTiktokUrl(copiedLink){
+		dataInterface:=Props{}
+		var err error
+		t.scraper.OnHTML("script[id=__NEXT_DATA__]", func(e *colly.HTMLElement) {
+			err=json.Unmarshal([]byte(e.Text),&dataInterface)
+		})
+		err=t.scraper.Visit(copiedLink)
+		data :=TiktokResultData{
+			ImageUrl: dataInterface.Props.PageProps.VideoData.ItemInfos.Image[0],
+			VideoUrl: dataInterface.Props.PageProps.VideoData.ItemInfos.Video.Url[0],
+			Text: dataInterface.Props.PageProps.VideoData.ItemInfos.Text,
+		}
+		return &data,err
+	}
+	return nil , errors.New("Invalid tiktok URL")
 }
 
 func NewTiktok() *Tiktok {
@@ -32,4 +42,12 @@ func NewTiktok() *Tiktok {
 		scraper: c,
 	}
 	return t
+}
+
+func isTiktokUrl(str string) bool {
+	if (strings.Contains(str,"tiktok")){
+		u, err := url.Parse(str)
+		return err == nil && u.Scheme != "" && u.Host != ""
+	}
+	return false
 }

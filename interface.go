@@ -24,3 +24,9 @@ type PageProps struct {
 type Props struct {
 	Props PageProps `json:"props"`
 }
+
+type TiktokResultData struct {
+	VideoURL string
+	ImageURL string
+	Text string
+}
