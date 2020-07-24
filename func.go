@@ -3,8 +3,11 @@ package tiktok
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gocolly/colly"
+	"log"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -12,7 +15,7 @@ type Tiktok struct {
 	scraper *colly.Collector
 }
 
-func (t *Tiktok) GetVideo(copiedLink string) (*TiktokResultData, error) {
+func (t *Tiktok) GetVideoProperties(copiedLink string) (*TiktokResultData, error) {
 	if isTiktokUrl(copiedLink){
 		dataInterface:=Props{}
 		var err error
@@ -28,6 +31,27 @@ func (t *Tiktok) GetVideo(copiedLink string) (*TiktokResultData, error) {
 		return &data,err
 	}
 	return nil , errors.New("Invalid tiktok URL")
+}
+
+func (t *Tiktok) Download(copiedLink string){
+	data,err:=t.GetVideoProperties(copiedLink)
+	if err!=nil{
+		log.Fatal(err)
+	}
+	t.scraper.OnResponse(func(response *colly.Response) {
+		video, err:=os.Create(data.Text+".mp4")
+		if err!=nil{
+			log.Fatal(err)
+		}
+		defer video.Close()
+		byte,err:=video.Write(response.Body)
+		fmt.Printf("Wrote %d bytes\n", byte)
+		video.Sync()
+	})
+	err=t.scraper.Visit(data.VideoURL)
+	if err!=nil{
+		log.Fatal(err)
+	}
 }
 
 func NewTiktok() *Tiktok {
